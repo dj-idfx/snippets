@@ -89,7 +89,7 @@
         let fontFile = new FontFace("Space Mono", "url(https://fonts.gstatic.com/s/spacemono/v12/i7dMIFZifjKcF5UAWdDRaPpZUFWaHg.woff2)");
         let fontStyle = "bold 80px Space Mono";
         let fontColor = "rgba(255,22,180,1)";
-        let fontLineHeight = 100;
+        let fontLineHeight = 96;
 
         /**
          * Helper Functions
@@ -175,11 +175,10 @@
             lines.push(currentLine);
 
             // print lines
-            let lineHeight = fontLineHeight;
             let y = 0;
             lines.forEach(function (item) {
-                text.fillText(item, canvas.width/2, canvas.height/2 + y - (lines.length-1) * lineHeight/2);
-                y = y + lineHeight;
+                text.fillText(item, canvas.width/2, canvas.height/2 + y - (lines.length-1) * fontLineHeight/2);
+                y = y + fontLineHeight;
             });
         }
 
