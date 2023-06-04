@@ -1,8 +1,10 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl-BE">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="../assets/favicon/favicon.ico">
     <title>Canvas demo</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
@@ -10,20 +12,25 @@
     <script src="../assets/jszip/jszip.min.js" async></script>
     <!-- FileSaver -->
     <script src="../assets/jszip/FileSaver.js" async></script>
+    <!-- Space Mono font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap">
 </head>
 <body>
 <!-- Demo canvas export -->
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-auto">
-            <h1 class="text-center">
+            <h1 class="text-center" style="font-family: 'Space Mono', var(--bs-font-sans-serif);">
                 Canvas export ZIP file
             </h1>
 
             <hr>
 
             <div class="mb-3">
-                <input id="inputText" type="text" class="form-control" aria-label="input text" maxlength="83" placeholder="Typ iets...">
+                <input id="inputText" type="text" class="form-control" aria-label="input text" maxlength="85"
+                       placeholder="Typ iets..." value="Probably the biggest limitation is, that once a shape gets drawn, it stays that way.">
             </div>
 
             <div class="mb-3">
@@ -37,7 +44,7 @@
 
             <div class="mb-3">
                 <button id="button" class="btn btn-dark">DOWNLOAD ZIP</button>
-                <div id="error" class="invalid-feedback">ERROR</div>
+                <div id="error" class="invalid-feedback">DOWNLOAD ERROR</div>
             </div>
         </div>
     </div>
@@ -47,6 +54,9 @@
     (() => {
         "use strict";
 
+        /**
+         * Global variables
+         */
         const backgroundCanvas = document.getElementById('backgroundCanvas');
         const canvas = document.getElementById('canvas');
         const inputText = document.getElementById('inputText');
@@ -56,6 +66,13 @@
         let bgImage = new Image();
         bgImage.src = "../assets/img/space.jpeg";
 
+        let fontFile = new FontFace("Space Mono", "url(https://fonts.gstatic.com/s/spacemono/v12/i7dMIFZifjKcF5UAWdDRaPpZUFWaHg.woff2)");
+        let fontStyle = "bold 40px Space Mono";
+        let fontColor = "rgba(255,0,0,1)"; // "red"
+
+        /**
+         * Helper Functions
+         */
         function clearCanvas() {
             backgroundCanvas.getContext("2d").clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
             canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
@@ -66,132 +83,146 @@
             canvas.getContext("2d").drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
 
-        function resetCanvas() {
+        function resetFrontCanvas() {
             canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
             canvas.getContext("2d").drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
 
         function defaultTextStyle() {
             let text = canvas.getContext("2d");
-            text.font = "bold 50px Arial";
+            text.font = fontStyle;
+            text.fillStyle = fontColor;
             text.textAlign = "center";
             text.textBaseline = "middle";
-            text.fillStyle = "red";
-            return text
+            return text;
         }
 
+        /**
+         * Main Script
+         */
         if (canvas.getContext && backgroundCanvas.getContext) {
             bgImage.onload = () => {
-                clearCanvas();
-                setCanvasBackground();
+                fontFile.load().then(() => {
+                    /* Load font */
+                    document.fonts.add(fontFile);
 
-                /* Create path */
-                let path = canvas.getContext("2d");
-                path.strokeStyle = "red";
-                path.lineWidth = 1;
+                    /* Set canvas */
+                    clearCanvas();
+                    setCanvasBackground();
 
-                /* Draw lines */
-                path.beginPath();
-                path.moveTo(0, 0);
-                path.lineTo(canvas.width*1, canvas.height*1);
-                path.moveTo(0, canvas.height*1);
-                path.lineTo(canvas.width*1, 0);
-                path.stroke();
+                    /* Create path */
+                    let path = canvas.getContext("2d");
+                    path.strokeStyle = fontColor;
+                    path.lineWidth = 1;
 
-                /* Draw square */
-                path.strokeRect(canvas.width/4, canvas.width/4, canvas.width/2, canvas.height/2);
-
-                /* Draw circles */
-                const circleCount = 10;
-                for (let i = 0; i < circleCount; i++) {
+                    /* Draw lines */
                     path.beginPath();
-                    path.arc(canvas.width/2, canvas.width/2, canvas.width/2 - canvas.width/2/circleCount*i, 0, 2 * Math.PI);
+                    path.moveTo(0, 0);
+                    path.lineTo(canvas.width*1, canvas.height*1);
+                    path.moveTo(0, canvas.height*1);
+                    path.lineTo(canvas.width*1, 0);
                     path.stroke();
-                }
 
-                /* Default Text */
-                let text = defaultTextStyle();
-                text.fillText("Typ iets...", canvas.width/2, canvas.height/2);
+                    /* Draw square */
+                    path.strokeRect(
+                        canvas.width/2 - canvas.width/4*Math.sqrt(2),
+                        canvas.width/2 - canvas.width/4*Math.sqrt(2),
+                        canvas.width/2 * Math.sqrt(2),
+                        canvas.width/2 * Math.sqrt(2)
+                    );
 
-                /* Input Text */
-                if (inputText) {
-                    inputText.oninput = () => {
-                        resetCanvas();
-                        let text = defaultTextStyle();
-
-                        // create array of multiple lines
-                        let value = inputText.value.trim();
-                        let words = value.split(" ");
-                        let lines = [];
-                        let currentLine = words[0];
-                        for (let i = 1; i < words.length; i++) {
-                            let word = words[i];
-                            let width = text.measureText(currentLine + " " + word).width;
-                            if (width < canvas.width * .75) {
-                                currentLine += " " + word;
-                            } else {
-                                lines.push(currentLine);
-                                currentLine = word;
-                            }
-                        }
-                        lines.push(currentLine);
-
-                        // print lines
-                        let lineHeight = 60
-                        let y = 0;
-                        lines.forEach(function (item) {
-                            text.fillText(item, canvas.width/2, canvas.height/2 + y - (lines.length-1) * lineHeight/2);
-                            y = y + lineHeight;
-                        });
+                    /* Draw circles */
+                    const circleCount = 24;
+                    for (let i = 0; i < circleCount; i++) {
+                        path.beginPath();
+                        path.arc(canvas.width/2, canvas.width/2, canvas.width/2 - canvas.width/2/circleCount*i, 0, 2 * Math.PI);
+                        path.stroke();
                     }
-                }
 
-                /* Upload new background image */
-                if (inputFile) {
-                    inputFile.oninput = (event) => {
-                        if(event.target.files) {
-                            let file = event.target.files[0];
-                            let reader = new FileReader();
-                            reader.readAsDataURL(file);
+                    /* Default Text */
+                    let text = defaultTextStyle();
+                    text.fillText("Typ iets...", canvas.width/2, canvas.height/2);
 
-                            reader.onloadend = (e) => {
-                                bgImage.src = e.target.result;
-                                bgImage.onload = (el) => {
-                                    //scale the image to canvas width and keep aspect ratio
-                                    let scaleFactor = canvas.width / el.target.width;
-                                    backgroundCanvas.height = el.target.height * scaleFactor;
-                                    canvas.height = el.target.height * scaleFactor;
+                    /* Input Text */
+                    if (inputText) {
+                        inputText.oninput = () => {
+                            resetFrontCanvas();
+                            let text = defaultTextStyle();
 
-                                    setCanvasBackground();
+                            // create array of multiple lines
+                            let value = inputText.value.trim();
+                            let words = value.split(" ");
+                            let lines = [];
+                            let currentLine = words[0];
+                            for (let i = 1; i < words.length; i++) {
+                                let word = words[i];
+                                let width = text.measureText(currentLine + " " + word).width;
+                                if (width < canvas.width * .75) {
+                                    currentLine += " " + word;
+                                } else {
+                                    lines.push(currentLine);
+                                    currentLine = word;
+                                }
+                            }
+                            lines.push(currentLine);
+
+                            // print lines
+                            let lineHeight = 50
+                            let y = 0;
+                            lines.forEach(function (item) {
+                                text.fillText(item, canvas.width/2, canvas.height/2 + y - (lines.length-1) * lineHeight/2);
+                                y = y + lineHeight;
+                            });
+                        }
+                    }
+
+                    /* Upload new background image */
+                    if (inputFile) {
+                        inputFile.oninput = (event) => {
+                            if(event.target.files) {
+                                let file = event.target.files[0];
+                                let reader = new FileReader();
+                                reader.readAsDataURL(file);
+
+                                reader.onloadend = (e) => {
+                                    bgImage.src = e.target.result;
+                                    bgImage.onload = (el) => {
+                                        //scale the image to canvas width and keep aspect ratio
+                                        let scaleFactor = canvas.width / el.target.width;
+                                        backgroundCanvas.height = el.target.height * scaleFactor;
+                                        canvas.height = el.target.height * scaleFactor;
+
+                                        setCanvasBackground();
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                /* Download ZIP */
-                if (button) {
-                    button.onclick = () => {
-                        // create zip & folder
-                        let zip = new JSZip();
-                        zip.folder("images");
-                        let folder = zip.folder("images");
+                    /* Download ZIP */
+                    if (button) {
+                        button.onclick = () => {
+                            // create zip & folder
+                            let zip = new JSZip();
+                            zip.folder("images");
+                            let folder = zip.folder("images");
 
-                        // create image from canvas
-                        let image = canvas.toDataURL().replace(/^data:image\/(png|jpg);base64,/, "");
+                            // create image from canvas
+                            let image = canvas.toDataURL().replace(/^data:image\/(png|jpg);base64,/, "");
 
-                        // add image to the zip folder
-                        folder.file("image.png", image, {base64: true});
+                            // add image to the zip folder
+                            folder.file("image.png", image, {base64: true});
 
-                        // return zip file
-                        zip.generateAsync({type:"blob"}).then(function (blob) {     // generate zip
-                            saveAs(blob, "images.zip");                             // download zip
-                        }, function (err) {
-                            document.getElementById('error').innerHTML = err;
-                            document.getElementById('error').classList.add('d-block');
-                        });
+                            // return zip file
+                            zip.generateAsync({type:"blob"}).then(function (blob) {     // generate zip
+                                saveAs(blob, "images.zip");                             // download zip
+                            }, function (err) {
+                                document.getElementById('error').innerHTML = err;
+                                document.getElementById('error').classList.add('d-block');
+                            });
+                        }
                     }
-                }
+                });
             }
         }
     })();
