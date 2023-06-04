@@ -53,8 +53,8 @@
 
                 <!-- Canvas -->
                 <div class="position-relative mb-3">
-                    <canvas id="backgroundCanvas" width="500" height="500" class="img-fluid position-relative z-0"> Background fallback </canvas>
-                    <canvas id="canvas" width="500" height="500" class="img-fluid position-absolute start-0 z-1 top-0"> Canvas fallback </canvas>
+                    <canvas id="backgroundCanvas" width="1000" height="1000" class="img-fluid position-relative z-0"> Background fallback </canvas>
+                    <canvas id="canvas" width="1000" height="1000" class="img-fluid position-absolute start-0 z-1 top-0"> Canvas fallback </canvas>
                 </div>
 
                 <!-- Download button -->
@@ -84,11 +84,12 @@
         const button = document.getElementById('button');
 
         let bgImage = new Image();
-        bgImage.src = "../assets/img/space.jpeg";
+        bgImage.src = "../assets/img/space.jpg";
 
         let fontFile = new FontFace("Space Mono", "url(https://fonts.gstatic.com/s/spacemono/v12/i7dMIFZifjKcF5UAWdDRaPpZUFWaHg.woff2)");
-        let fontStyle = "bold 40px Space Mono";
+        let fontStyle = "bold 80px Space Mono";
         let fontColor = "rgba(255,22,180,1)";
+        let fontLineHeight = 100;
 
         /**
          * Helper Functions
@@ -174,7 +175,7 @@
             lines.push(currentLine);
 
             // print lines
-            let lineHeight = 50
+            let lineHeight = fontLineHeight;
             let y = 0;
             lines.forEach(function (item) {
                 text.fillText(item, canvas.width/2, canvas.height/2 + y - (lines.length-1) * lineHeight/2);
