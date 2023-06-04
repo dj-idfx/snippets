@@ -22,19 +22,29 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-auto">
-            <h1 class="text-center" style="font-family: 'Space Mono', var(--bs-font-sans-serif);">
+            <h1 class="fs-2 text-center" style="font-family: 'Space Mono', var(--bs-font-sans-serif);">
                 Canvas export ZIP file
             </h1>
 
             <hr>
 
-            <div class="mb-3">
-                <input id="inputText" type="text" class="form-control" aria-label="input text" maxlength="85"
-                       placeholder="Typ iets..." value="Probably the biggest limitation is, that once a shape gets drawn, it stays that way.">
+            <div class="mb-3 row g-3">
+                <div class="col">
+                    <input id="inputText" type="text" class="form-control" maxlength="85"
+                           aria-label="Input your text" title="Input your text"
+                           placeholder="Typ iets..." value="Probably the biggest limitation is, that once a shape gets drawn, it stays that way.">
+                </div>
+
+                <div class="col-auto">
+                    <input id="inputColor" type="color" class="form-control form-control-color"
+                           aria-label="Choose your color" title="Choose your color"
+                           value="#ff0000">
+                </div>
             </div>
 
             <div class="mb-3">
-                <input id="inputFile" type="file" class="form-control" aria-label="upload image" accept="image/png, image/jpeg, image/bmp, image/gif">
+                <input id="inputFile" type="file" class="form-control" accept="image/png, image/jpeg, image/bmp, image/gif"
+                       aria-label="Upload your image" title="Upload your image">
             </div>
 
             <div class="position-relative mb-3">
@@ -60,6 +70,7 @@
         const backgroundCanvas = document.getElementById('backgroundCanvas');
         const canvas = document.getElementById('canvas');
         const inputText = document.getElementById('inputText');
+        const inputColor = document.getElementById('inputColor');
         const inputFile = document.getElementById('inputFile');
         const button = document.getElementById('button');
 
@@ -139,11 +150,11 @@
                         path.stroke();
                     }
 
-                    /* Default Text */
+                    /* Default text */
                     let text = defaultTextStyle();
                     text.fillText("Typ iets...", canvas.width/2, canvas.height/2);
 
-                    /* Input Text */
+                    /* Input new text */
                     if (inputText) {
                         inputText.oninput = () => {
                             resetFrontCanvas();
@@ -173,6 +184,13 @@
                                 text.fillText(item, canvas.width/2, canvas.height/2 + y - (lines.length-1) * lineHeight/2);
                                 y = y + lineHeight;
                             });
+                        }
+                    }
+
+                    /* Choose new color */
+                    if (inputColor) {
+                        inputColor.oninput = () => {
+                            fontColor = inputColor.value;
                         }
                     }
 
