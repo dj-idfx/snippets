@@ -102,7 +102,21 @@
             canvas.getContext("2d").drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
 
-        function initFrontCanvas() {
+        function resetFrontCanvas() {
+            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+            canvas.getContext("2d").drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        function defaultTextStyle() {
+            let text = canvas.getContext("2d");
+            text.font = fontStyle;
+            text.fillStyle = fontColor;
+            text.textAlign = "center";
+            text.textBaseline = "middle";
+            return text;
+        }
+
+        function defaultFrontCanvas() {
             /* Create path */
             let path = canvas.getContext("2d");
             path.strokeStyle = fontColor;
@@ -137,20 +151,6 @@
             text.fillText("Typ iets...", canvas.width/2, canvas.height/2);
         }
 
-        function resetFrontCanvas() {
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-            canvas.getContext("2d").drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-        }
-
-        function defaultTextStyle() {
-            let text = canvas.getContext("2d");
-            text.font = fontStyle;
-            text.fillStyle = fontColor;
-            text.textAlign = "center";
-            text.textBaseline = "middle";
-            return text;
-        }
-
         function setText() {
             resetFrontCanvas();
             let text = defaultTextStyle();
@@ -182,7 +182,7 @@
         }
 
         /**
-         * Main Script
+         * Main script with event listeners
          */
         if (canvas.getContext && backgroundCanvas.getContext) {
             bgImage.onload = () => {
@@ -190,10 +190,10 @@
                     /* Load font */
                     document.fonts.add(fontFile);
 
-                    /* Setup initial canvas */
+                    /* Setup default canvas */
                     clearCanvas();
                     setCanvasBackground();
-                    initFrontCanvas();
+                    defaultFrontCanvas();
 
                     /* Input new text */
                     if (inputText) {
@@ -227,6 +227,7 @@
                                         canvas.height = el.target.height * scaleFactor;
 
                                         setCanvasBackground();
+                                        setText();
                                     }
                                 }
                             }
@@ -236,7 +237,7 @@
                     /* Download ZIP */
                     if (button) {
                         button.onclick = () => {
-                            // create zip & folder
+                            // create zip with folder
                             let zip = new JSZip();
                             zip.folder("images");
                             let folder = zip.folder("images");
