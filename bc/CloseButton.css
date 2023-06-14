@@ -1,0 +1,25 @@
+.bcToasterCloseButton {
+    /* Text color */
+    color: black;
+    border: solid 1px #999;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+
+}
+.bcToaster.bcShowClose.bcDefaultClose .bcClose {
+    border-radius: 18px;
+    background-image: url(https://roularta.blueconic.net/rest/dialogues/files/6e53531e-0246-489f-ae49-4f25199d1d4f/close_btn.png);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    background-size: 120px 25px;
+
+    background-repeat: 0;
+}
+.bcToaster.bcShowClose .bcClose {
+    display: block;
+    width: 60px;
+    height: 25px;
+}
+
+.bcToaster.bcShowClose.bcDefaultClose .bcClose:hover {
+    background-position: 60px 0px;
+}
